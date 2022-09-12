@@ -22,28 +22,43 @@ public class TicTacToe {
         ticTacToe.startGame(scanner);
     }
 
+    public void startGame(Scanner scanner) {
+        print(showInstructions());
+        Marker marker = getPlayerMarker(scanner);
+        initializePlayers(marker);
+    }
+
     public Optional<Marker> getMarkerFromUserInput(Scanner scanner) {
         String next = scanner.next();
         return Marker.getValue(next.trim());
     }
 
+    // TODO: fix this method, decouple
     public Optional<Cell> getCellFromUserInput(Scanner scanner) {
+        String format_error = "Invalid value, format is x%sy where x and y should be more than one and less than %d"
+                .formatted(CELL_SEPARATOR_REGEX, this.board.length);
         String next = scanner.next();
         String[] dataArr = next.split(CELL_SEPARATOR_REGEX);
         if (dataArr.length != 2) {
+            print(format_error);
             return Optional.empty();
         }
-        int x, y;
+        Cell cell;
         try {
-            x = Integer.parseInt(dataArr[0]);
-            y = Integer.parseInt(dataArr[1]);
+            cell = new Cell(Integer.parseInt(dataArr[0]), Integer.parseInt(dataArr[1]));
         } catch (NumberFormatException ignored) {
+            print(format_error);
             return Optional.empty();
         }
-        if (x < 1 || y < 1 || x > this.board.length || y > this.board[0].length) {
+        if (cell.x < 1 || cell.y < 1 || cell.x > this.board.length || cell.y > this.board[0].length) {
+            print(format_error);
             return Optional.empty();
         }
-        return Optional.of(new Cell(x, y));
+        if (this.board[cell.x - 1][cell.y - 1] != EMPTY) {
+            print("Cell has already selected, choose another one");
+            return Optional.empty();
+        }
+        return Optional.of(cell);
     }
 
     public String showInstructions() {
@@ -71,12 +86,6 @@ public class TicTacToe {
         return sb.toString();
     }
 
-    public void startGame(Scanner scanner) {
-        print(showInstructions());
-        Marker marker = getFirstPlayerMarker(scanner);
-        initializePlayers(marker);
-    }
-
     private void print(String text) {
         System.out.println(text);
     }
@@ -86,7 +95,7 @@ public class TicTacToe {
         this.player[1] = new Player(firstPlayer.next());
     }
 
-    private Marker getFirstPlayerMarker(Scanner scanner) {
+    private Marker getPlayerMarker(Scanner scanner) {
         Optional<Marker> optionalMarker;
         do {
             optionalMarker = getMarkerFromUserInput(scanner);
@@ -99,12 +108,22 @@ public class TicTacToe {
 
 
     enum Marker {
-        X, O;
+        X('X'), O('O');
+
+        private final char value;
+
+        Marker(char v) {
+            this.value = v;
+        }
 
         public static Optional<Marker> getValue(String value) {
             return Arrays.stream(Marker.values())
                     .filter(marker -> marker.name().equalsIgnoreCase(value))
                     .findFirst();
+        }
+
+        public char getValue() {
+            return value;
         }
 
         public Marker next() {

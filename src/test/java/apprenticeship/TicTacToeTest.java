@@ -25,6 +25,8 @@ class TicTacToeTest {
             "To begin, choose who starts the game by entering X or O." + NEW_LINE +
             "To exit the game press ^C" + NEW_LINE;
     private static final String ERROR_MARKER_LINE = "Invalid value, To begin, choose who starts the game by entering X or O.";
+    private static final String ERROR_INVALID_VALUE_FORMAT = "Invalid value, format is x,y where x and y should be more than one and less than 3\n";
+    private static final String ERROR_CELL_SELECTED = "Cell has already selected, choose another one\n";
     TicTacToe ticTacToe;
     ByteArrayOutputStream SYSTEM_OUT = new ByteArrayOutputStream();
 
@@ -167,6 +169,7 @@ class TicTacToeTest {
         Scanner scanner = new Scanner(userInput);
         Optional<TicTacToe.Cell> cellOptional = this.ticTacToe.getCellFromUserInput(scanner);
         assertTrue(cellOptional.isEmpty());
+        assertEquals(ERROR_INVALID_VALUE_FORMAT, SYSTEM_OUT.toString());
     }
 
     @ParameterizedTest
@@ -177,6 +180,16 @@ class TicTacToeTest {
         Scanner scanner = new Scanner(userInput);
         Optional<TicTacToe.Cell> cellOptional = this.ticTacToe.getCellFromUserInput(scanner);
         assertTrue(cellOptional.isEmpty());
+        assertEquals(ERROR_INVALID_VALUE_FORMAT, SYSTEM_OUT.toString());
+    }
+
+    @Test
+    void whenChoosingCell_shouldNotGetCellWithInvalidRange() {
+        this.ticTacToe.board[0][0] = TicTacToe.Marker.X.getValue();
+        Scanner scanner = new Scanner("1,1");
+        Optional<TicTacToe.Cell> cellOptional = this.ticTacToe.getCellFromUserInput(scanner);
+        assertTrue(cellOptional.isEmpty());
+        assertEquals(ERROR_CELL_SELECTED, SYSTEM_OUT.toString());
     }
 
 
