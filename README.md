@@ -1,11 +1,9 @@
 # Tic-Tac-Toe
 
----
 Yet another Tic-Tac-Toe application in Java. Maven is required to build, run and test.
 
 ## How to build
 
----
 You can build the application and create the jar file with following command:
 
 ```
@@ -16,7 +14,6 @@ jar file will be created in the target folder.
 
 ## How to test
 
----
 To run all the tests you can use with following command:
 
 ```
