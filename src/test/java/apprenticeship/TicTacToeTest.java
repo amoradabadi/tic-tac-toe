@@ -1,8 +1,13 @@
+package apprenticeship;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -11,10 +16,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TicTacToeTest {
     TicTacToe ticTacToe;
+    ByteArrayOutputStream SYSTEM_OUT = new ByteArrayOutputStream();
 
     @BeforeEach
-    void dummy() {
+    void setup() {
+        System.setOut(new PrintStream(SYSTEM_OUT));
         this.ticTacToe = new TicTacToe();
+    }
+
+    @AfterEach
+    void tearDown() {
+        System.setOut(System.out);
     }
 
     @Test
@@ -108,14 +120,22 @@ class TicTacToeTest {
 
     @Test
     void whenStartGame_shouldKeepAsking() {
-        String userInput = "some\n" +
-                "invalid\n" +
-                "texts\n" +
-                "X";
+        String userInput = """
+                some
+                invalid
+                texts
+                X
+                """;
         Scanner scanner = new Scanner(userInput);
 
         this.ticTacToe.startGame(scanner);
 
+        assertEquals("""
+                        Invalid value, To begin, choose who starts the game by entering X or O.
+                        Invalid value, To begin, choose who starts the game by entering X or O.
+                        Invalid value, To begin, choose who starts the game by entering X or O.
+                        """,
+                SYSTEM_OUT.toString());
         assertEquals(this.ticTacToe.player[0].marker(), TicTacToe.Marker.X);
         assertEquals(this.ticTacToe.player[1].marker(), TicTacToe.Marker.O);
     }

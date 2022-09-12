@@ -1,6 +1,6 @@
 # Tic-Tac-Toe
 
-Yet another Tic-Tac-Toe application in Java. Maven is required to build, run and test.
+Yet another Tic-Tac-Toe application in Java. Java 17 and Maven are required to build, run and test.
 
 ## How to build
 
@@ -26,12 +26,17 @@ mvn test
 
 ```
   mvn clean package
-  cd target
-  java -cp "*" TicTacToe
-  ```
+  cd target && java -cp "*" apprenticeship.TicTacToe
+```
 
 - Using Maven
 
 ```
-mvn compile exec:java -Dexec.mainClass="TicTacToe"
+mvn compile exec:java -Dexec.mainClass="apprenticeship.TicTacToe"
+```
+
+## How to run pi test (https://pitest.org/)
+
+```
+mvn test-compile org.pitest:pitest-maven:mutationCoverage
 ```
