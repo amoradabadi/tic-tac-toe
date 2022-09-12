@@ -15,6 +15,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TicTacToeTest {
+    private static final String NEW_LINE = "\n";
+    private static final String INSTRUCTIONS = "Welcome to Tic-Tac-Toe" +
+            NEW_LINE +
+            NEW_LINE +
+            "To select a cell for your move enter the position of the row and the column, separated with ," + NEW_LINE +
+            "Example: 1,3 puts the sign in the first row and third column." + NEW_LINE +
+            NEW_LINE +
+            "To begin, choose who starts the game by entering X or O." + NEW_LINE +
+            "To exit the game press ^C" + NEW_LINE;
+    private static final String ERROR_MARKER_LINE = "Invalid value, To begin, choose who starts the game by entering X or O.";
     TicTacToe ticTacToe;
     ByteArrayOutputStream SYSTEM_OUT = new ByteArrayOutputStream();
 
@@ -31,14 +41,7 @@ class TicTacToeTest {
 
     @Test
     void shouldShowInstructions() {
-        assertEquals("Welcome to Tic-Tac-Toe\n" +
-                        "\n" +
-                        "To select a cell for your move enter the position of the row and the column, separated with an x.\n" +
-                        "Example: 1x3 puts the sign in the first row and third column.\n" +
-                        "\n" +
-                        "To begin, choose who starts the game by entering X or O.\n" +
-                        "To exit the game press ^C\n",
-                this.ticTacToe.showInstructions());
+        assertEquals(INSTRUCTIONS, this.ticTacToe.showInstructions());
     }
 
     @Test
@@ -130,14 +133,51 @@ class TicTacToeTest {
 
         this.ticTacToe.startGame(scanner);
 
-        assertEquals("""
-                        Invalid value, To begin, choose who starts the game by entering X or O.
-                        Invalid value, To begin, choose who starts the game by entering X or O.
-                        Invalid value, To begin, choose who starts the game by entering X or O.
-                        """,
+        assertEquals(INSTRUCTIONS + NEW_LINE +
+                        ERROR_MARKER_LINE + NEW_LINE +
+                        ERROR_MARKER_LINE + NEW_LINE +
+                        ERROR_MARKER_LINE + NEW_LINE,
                 SYSTEM_OUT.toString());
         assertEquals(this.ticTacToe.player[0].marker(), TicTacToe.Marker.X);
         assertEquals(this.ticTacToe.player[1].marker(), TicTacToe.Marker.O);
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "1,1", "1,2", "1,3",
+            "2,1", "2,2", "2,3",
+            "3,1", "3,2", "3,3",
+    })
+    void whenChoosingCell_shouldGetCell(String userInput) {
+        Scanner scanner = new Scanner(userInput);
+        Optional<TicTacToe.Cell> cellOptional = this.ticTacToe.getCellFromUserInput(scanner);
+        assertTrue(cellOptional.isPresent());
+        String[] split = userInput.split(this.ticTacToe.CELL_SEPARATOR_REGEX);
+        assertEquals(Integer.parseInt(split[0]), cellOptional.get().x());
+        assertEquals(Integer.parseInt(split[1]), cellOptional.get().y());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "1x2", "ax2", "0x2", "0x0",
+            "4x1", "0x2", "11", "a",
+            "1 2", "2X3", "1", "a,b"
+    })
+    void whenChoosingCell_shouldNotGetCell(String userInput) {
+        Scanner scanner = new Scanner(userInput);
+        Optional<TicTacToe.Cell> cellOptional = this.ticTacToe.getCellFromUserInput(scanner);
+        assertTrue(cellOptional.isEmpty());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "0,0", "1,4", "4,1", "4,4"
+    })
+    void whenChoosingCell_shouldNotGetCellWithInvalidRange(String userInput) {
+        Scanner scanner = new Scanner(userInput);
+        Optional<TicTacToe.Cell> cellOptional = this.ticTacToe.getCellFromUserInput(scanner);
+        assertTrue(cellOptional.isEmpty());
+    }
+
 
 }
