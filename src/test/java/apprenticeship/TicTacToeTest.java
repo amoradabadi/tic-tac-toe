@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.Optional;
 import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,8 +26,26 @@ class TicTacToeTest {
             NEW_LINE +
             "To begin, choose who starts the game by entering X or O." + NEW_LINE +
             "To exit the game press q" + NEW_LINE;
-    private static final String ERROR_INVALID_VALUE_FORMAT = "Invalid value, format is x,y where x and y should be between one and 3" + NEW_LINE;
+    private static final String ERROR_INVALID_VALUE_FORMAT = "Invalid value, format is x,y where x and y should be between 1 and 3" + NEW_LINE;
     private static final String ERROR_INVALID_VALUE = "Invalid value, To begin, choose who starts the game by entering X or O." + NEW_LINE;
+    private static final String PLAYER_X = "Player X: ";
+    private static final String PLAYER_O = "Player O: ";
+    private static final String EMPTY_TABLE = """
+            +---+---+---+
+            |   |   |   |
+            +---+---+---+
+            |   |   |   |
+            +---+---+---+
+            |   |   |   |
+            +---+---+---+""";
+    private static final String NON_EMPTY_TABLE = """
+            +---+---+---+
+            | X |   |   |
+            +---+---+---+
+            |   |   |   |
+            +---+---+---+
+            |   |   |   |
+            +---+---+---+""";
 
     private TicTacToe ticTacToe;
     private ByteArrayOutputStream SYSTEM_OUT;
@@ -44,167 +62,123 @@ class TicTacToeTest {
         System.setOut(System.out);
     }
 
-    @Test
-    void shouldShowInstructions() {
-        assertEquals(INSTRUCTIONS, this.ticTacToe.showInstructions());
-    }
-
-    @Test
-    void shouldPrintEmptyTable() {
-        assertEquals(getTableOutput(), this.ticTacToe.drawTable());
-    }
-
     @ParameterizedTest
     @ValueSource(strings = {"x", "X", " X", "X ", " X "})
-    void whenChoosingMarker_shouldReturnX(String userInput) {
+    void whenWithDifferentCase_shouldSelectX(String userInput) {
         Scanner scanner = new Scanner(userInput + NEW_LINE + QUIT);
 
-        this.ticTacToe.startGame(scanner);
+        this.ticTacToe.start(scanner);
 
         assertEquals(INSTRUCTIONS + NEW_LINE +
-                getTableOutput() + NEW_LINE +
-                "Player X: " + NEW_LINE +
+                EMPTY_TABLE + NEW_LINE +
+                PLAYER_X + NEW_LINE +
                 EXIT, SYSTEM_OUT.toString());
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"o", "O", " O", "O ", " O "})
-    void whenChoosingMarker_shouldReturnO(String userInput) {
+    void whenWithDifferentCase_shouldSelectO(String userInput) {
         Scanner scanner = new Scanner(userInput + NEW_LINE + QUIT);
 
-        this.ticTacToe.startGame(scanner);
+        this.ticTacToe.start(scanner);
 
         assertEquals(INSTRUCTIONS + NEW_LINE +
-                getTableOutput() + NEW_LINE +
-                "Player O: " + NEW_LINE +
+                EMPTY_TABLE + NEW_LINE +
+                PLAYER_O + NEW_LINE +
                 EXIT, SYSTEM_OUT.toString());
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"anything", "XX", "XO"})
-    void whenChoosingMarkerIsInvalid_shouldReturnNull(String userInput) {
+    void whenInvalidMarker_shouldReturnError(String userInput) {
         Scanner scanner = new Scanner(userInput + NEW_LINE + QUIT);
 
-        this.ticTacToe.startGame(scanner);
+        this.ticTacToe.start(scanner);
 
         assertEquals(INSTRUCTIONS + NEW_LINE +
                 ERROR_INVALID_VALUE +
                 EXIT, SYSTEM_OUT.toString());
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"0,1", "1,0", "1,4", "4,1"})
+    void whenInvalidCellRange_shouldReturnError(String userInput) {
+        Scanner scanner = new Scanner("X" + NEW_LINE +
+                userInput + NEW_LINE
+                + QUIT);
+
+        this.ticTacToe.start(scanner);
+
+        assertEquals(INSTRUCTIONS + NEW_LINE +
+                EMPTY_TABLE + NEW_LINE +
+                PLAYER_X + NEW_LINE +
+                ERROR_INVALID_VALUE_FORMAT +
+                EXIT, SYSTEM_OUT.toString());
+    }
+
     @Test
-    void whenChoosingMarkerIsInvalid_shouldReturnNull() {
+    void whenInvalidCell_shouldReturnError() {
         String userInput = "X" + NEW_LINE +
                 "anything" + NEW_LINE +
                 QUIT;
         Scanner scanner = new Scanner(userInput);
 
-        this.ticTacToe.startGame(scanner);
+        this.ticTacToe.start(scanner);
 
         assertEquals(INSTRUCTIONS + NEW_LINE +
-                getTableOutput() + NEW_LINE +
-                "Player X: " + NEW_LINE +
-                "Invalid value, format is x,y where x and y should be between one and 3" + NEW_LINE +
-                "Player X: " + NEW_LINE +
+                EMPTY_TABLE + NEW_LINE +
+                PLAYER_X + NEW_LINE +
+                ERROR_INVALID_VALUE_FORMAT +
                 EXIT, SYSTEM_OUT.toString());
     }
 
     @Test
-    void whenStartGame_shouldSetMarkerForO() {
+    void whenMarkerIsValid_shouldSelectPlayerO() {
         String userInput = "O" + NEW_LINE + QUIT;
         Scanner scanner = new Scanner(userInput);
 
-        this.ticTacToe.startGame(scanner);
+        this.ticTacToe.start(scanner);
 
         assertEquals(INSTRUCTIONS + NEW_LINE +
-                getTableOutput() + NEW_LINE +
-                "Player O: " + NEW_LINE +
+                EMPTY_TABLE + NEW_LINE +
+                PLAYER_O + NEW_LINE +
                 EXIT, SYSTEM_OUT.toString());
     }
 
-    private String getTableOutput() {
-        return """
-                +---+---+---+
-                |   |   |   |
-                +---+---+---+
-                |   |   |   |
-                +---+---+---+
-                |   |   |   |
-                +---+---+---+""";
-    }
-
-    private String getTableOutput2() {
-        return """
-                +---+---+---+
-                | X |   |   |
-                +---+---+---+
-                |   |   |   |
-                +---+---+---+
-                |   |   |   |
-                +---+---+---+""";
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "1,1", "1,2", "1,3",
-            "2,1", "2,2", "2,3",
-            "3,1", "3,2", "3,3",
-    })
-    void whenChoosingCell_shouldGetCell(String userInput) throws TicTacToe.QuitException {
+    @Test
+    void whenMarkerIsValid_shouldSelectPlayerX() {
+        String userInput = "X" + NEW_LINE + QUIT;
         Scanner scanner = new Scanner(userInput);
-        Optional<TicTacToe.Cell> cellOptional = this.ticTacToe.getCellFromUserInput(scanner);
-        assertTrue(cellOptional.isPresent());
-        String[] split = userInput.split(",");
-        assertEquals(Integer.parseInt(split[0]), cellOptional.get().x());
-        assertEquals(Integer.parseInt(split[1]), cellOptional.get().y());
-    }
 
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "1x2", "ax2", "0x2", "0x0",
-            "4x1", "0x2", "11", "a",
-            "1 2", "2X3", "1", "a,b"
-    })
-    void whenChoosingCell_shouldNotGetCell(String userInput) throws TicTacToe.QuitException {
-        Scanner scanner = new Scanner(userInput);
-        Optional<TicTacToe.Cell> cellOptional = this.ticTacToe.getCellFromUserInput(scanner);
-        assertTrue(cellOptional.isEmpty());
-        assertEquals(ERROR_INVALID_VALUE_FORMAT, SYSTEM_OUT.toString());
-    }
+        this.ticTacToe.start(scanner);
 
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "0,0", "1,4", "4,1", "4,4"
-    })
-    void whenChoosingCell_shouldNotGetCellWithInvalidRange(String userInput) throws TicTacToe.QuitException {
-        Scanner scanner = new Scanner(userInput);
-        Optional<TicTacToe.Cell> cellOptional = this.ticTacToe.getCellFromUserInput(scanner);
-        assertTrue(cellOptional.isEmpty());
-        assertEquals(ERROR_INVALID_VALUE_FORMAT, SYSTEM_OUT.toString());
+        assertEquals(INSTRUCTIONS + NEW_LINE +
+                EMPTY_TABLE + NEW_LINE +
+                PLAYER_X + NEW_LINE +
+                EXIT, SYSTEM_OUT.toString());
     }
 
     @Test
-    void whenChoosingCell_shouldNotGetCellWhenAlreadySelected() {
+    void whenCellAlreadySelected_shouldReturnError() {
         String userInput = "X" + NEW_LINE +
                 "1,1" + NEW_LINE + // X
                 "1,1" + NEW_LINE + // O
                 QUIT;
 
         Scanner scanner = new Scanner(userInput);
-        this.ticTacToe.startGame(scanner);
+        this.ticTacToe.start(scanner);
 
         assertEquals(INSTRUCTIONS + NEW_LINE +
-                getTableOutput() + NEW_LINE +
-                "Player X: " + NEW_LINE +
-                getTableOutput2() + NEW_LINE +
-                "Player O: " + NEW_LINE +
+                EMPTY_TABLE + NEW_LINE +
+                PLAYER_X + NEW_LINE +
+                NON_EMPTY_TABLE + NEW_LINE +
+                PLAYER_O + NEW_LINE +
                 "Cell has already selected, choose another one" + NEW_LINE +
-                "Player O: " + NEW_LINE +
                 EXIT, SYSTEM_OUT.toString());
     }
 
     @Test
-    void whenFirstRowIsFull_checkStatusHasWinner() {
+    void whenFirstRowIsFull_shouldWin() {
         String userInput = "X" + NEW_LINE +
                 "1,1" + NEW_LINE + // X
                 "2,1" + NEW_LINE + // O
@@ -213,13 +187,14 @@ class TicTacToeTest {
                 "1,3" + NEW_LINE;  // X
         Scanner scanner = new Scanner(userInput);
 
-        this.ticTacToe.startGame(scanner);
+        this.ticTacToe.start(scanner);
 
-        assertEquals(TicTacToe.GameStatus.FINISHED_WINNER, this.ticTacToe.checkStatus());
+        assertTrue(SYSTEM_OUT.toString().endsWith("Player X has won." + NEW_LINE));
+
     }
 
     @Test
-    void whenSecondRowIsFull_checkStatusHasWinner() {
+    void whenSecondRowIsFull_shouldWin() {
         String userInput = "X" + NEW_LINE +
                 "2,1" + NEW_LINE + // X
                 "1,1" + NEW_LINE + // O
@@ -228,13 +203,13 @@ class TicTacToeTest {
                 "2,3" + NEW_LINE;  // X
         Scanner scanner = new Scanner(userInput);
 
-        this.ticTacToe.startGame(scanner);
+        this.ticTacToe.start(scanner);
 
-        assertEquals(TicTacToe.GameStatus.FINISHED_WINNER, this.ticTacToe.checkStatus());
+        assertTrue(SYSTEM_OUT.toString().endsWith("Player X has won." + NEW_LINE));
     }
 
     @Test
-    void whenThirdRowIsFull_checkStatusHasWinner() {
+    void whenThirdRowIsFull_shouldWin() {
         String userInput = "X" + NEW_LINE +
                 "3,1" + NEW_LINE + // X
                 "1,1" + NEW_LINE + // O
@@ -244,14 +219,14 @@ class TicTacToeTest {
 
         Scanner scanner = new Scanner(userInput);
 
-        this.ticTacToe.startGame(scanner);
+        this.ticTacToe.start(scanner);
 
-        assertEquals(TicTacToe.GameStatus.FINISHED_WINNER, this.ticTacToe.checkStatus());
+        assertTrue(SYSTEM_OUT.toString().endsWith("Player X has won." + NEW_LINE));
     }
 
 
     @Test
-    void whenFirstColIsFull_checkStatusHasWinner() {
+    void whenFirstColIsFull_shouldWin() {
         String userInput = "X" + NEW_LINE +
                 "1,1" + NEW_LINE + // X
                 "2,3" + NEW_LINE + // O
@@ -260,13 +235,13 @@ class TicTacToeTest {
                 "3,1" + NEW_LINE; // X
         Scanner scanner = new Scanner(userInput);
 
-        this.ticTacToe.startGame(scanner);
+        this.ticTacToe.start(scanner);
 
-        assertEquals(TicTacToe.GameStatus.FINISHED_WINNER, this.ticTacToe.checkStatus());
+        assertTrue(SYSTEM_OUT.toString().endsWith("Player X has won." + NEW_LINE));
     }
 
     @Test
-    void whenSecondColIsFull_checkStatusHasWinner() {
+    void whenSecondColIsFull_shouldWin() {
         String userInput = "X" + NEW_LINE +
                 "2,1" + NEW_LINE + // X
                 "3,1" + NEW_LINE + // O
@@ -275,13 +250,13 @@ class TicTacToeTest {
                 "2,3" + NEW_LINE; // X
         Scanner scanner = new Scanner(userInput);
 
-        this.ticTacToe.startGame(scanner);
+        this.ticTacToe.start(scanner);
 
-        assertEquals(TicTacToe.GameStatus.FINISHED_WINNER, this.ticTacToe.checkStatus());
+        assertTrue(SYSTEM_OUT.toString().endsWith("Player X has won." + NEW_LINE));
     }
 
     @Test
-    void whenThirdColIsFull_checkStatusHasWinner() {
+    void whenThirdColIsFull_shouldWin() {
         String userInput = "X" + NEW_LINE +
                 "3,1" + NEW_LINE + // X
                 "1,1" + NEW_LINE + // O
@@ -290,13 +265,13 @@ class TicTacToeTest {
                 "3,3" + NEW_LINE; // X
         Scanner scanner = new Scanner(userInput);
 
-        this.ticTacToe.startGame(scanner);
+        this.ticTacToe.start(scanner);
 
-        assertEquals(TicTacToe.GameStatus.FINISHED_WINNER, this.ticTacToe.checkStatus());
+        assertTrue(SYSTEM_OUT.toString().endsWith("Player X has won." + NEW_LINE));
     }
 
     @Test
-    void whenDiagonalIsFull_checkStatusHasWinner() {
+    void whenDiagonalIsFull_shouldWin() {
         String userInput = "X" + NEW_LINE +
                 "1,1" + NEW_LINE + // X
                 "1,2" + NEW_LINE + // O
@@ -305,13 +280,13 @@ class TicTacToeTest {
                 "3,3" + NEW_LINE; // X
         Scanner scanner = new Scanner(userInput);
 
-        this.ticTacToe.startGame(scanner);
+        this.ticTacToe.start(scanner);
 
-        assertEquals(TicTacToe.GameStatus.FINISHED_WINNER, this.ticTacToe.checkStatus());
+        assertTrue(SYSTEM_OUT.toString().endsWith("Player X has won." + NEW_LINE));
     }
 
     @Test
-    void whenBackDiagonalIsFull_checkStatusHasWinner() {
+    void whenBackDiagonalIsFull_shouldWin() {
         String userInput = "X" + NEW_LINE +
                 "1,3" + NEW_LINE + // X
                 "1,2" + NEW_LINE + // O
@@ -320,13 +295,13 @@ class TicTacToeTest {
                 "3,1" + NEW_LINE; // X
         Scanner scanner = new Scanner(userInput);
 
-        this.ticTacToe.startGame(scanner);
+        this.ticTacToe.start(scanner);
 
-        assertEquals(TicTacToe.GameStatus.FINISHED_WINNER, this.ticTacToe.checkStatus());
+        assertTrue(SYSTEM_OUT.toString().endsWith("Player X has won." + NEW_LINE));
     }
 
     @Test
-    void whenNoWinner_checkStatusIsDraw() {
+    void whenNoWinner_shouldDraw() {
         String userInput = "X" + NEW_LINE +
                 "1,2" + NEW_LINE + // X
                 "1,1" + NEW_LINE + // O
@@ -339,9 +314,16 @@ class TicTacToeTest {
                 "3,3" + NEW_LINE;  // X
         Scanner scanner = new Scanner(userInput);
 
-        this.ticTacToe.startGame(scanner);
+        this.ticTacToe.start(scanner);
 
-        assertEquals(TicTacToe.GameStatus.FINISHED_DRAW, this.ticTacToe.checkStatus());
+        assertTrue(SYSTEM_OUT.toString().endsWith("No winner, game is draw." + NEW_LINE));
+    }
+
+    @Test
+    void test_main() {
+        System.setIn(new ByteArrayInputStream("q\n".getBytes()));
+        TicTacToe.main(new String[]{});
+        assertEquals(INSTRUCTIONS + NEW_LINE + EXIT, SYSTEM_OUT.toString());
     }
 
 }
