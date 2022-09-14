@@ -11,7 +11,7 @@ public class HumanPlayer extends Player {
     private final CellScanner cellScanner;
 
     public HumanPlayer(Scanner scanner, Marker marker, Board board) {
-        super(marker, PlayerType.HUMAN);
+        super(marker);
         this.cellScanner = new CellScanner(scanner, board);
     }
 

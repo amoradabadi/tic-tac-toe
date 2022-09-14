@@ -26,4 +26,5 @@ public class Constants {
 
     public static final String HUMAN_OR_COMPUTER = "Is '%s' a computer (c) or a Human (h) ?";
     public static final String BYE = "Bye";
+    public static final String PLAYER_SELECTED = "Player '%s' selected %s";
 }
