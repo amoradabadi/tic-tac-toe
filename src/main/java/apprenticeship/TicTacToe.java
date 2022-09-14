@@ -41,13 +41,14 @@ public class TicTacToe {
 
     private void initializePlayers(Scanner scanner) throws QuitException {
         Marker firstPlayerMarker = new MarkerScanner(scanner).getMarker();
+        PlayerTypeScanner playerTypeScanner = new PlayerTypeScanner(scanner);
 
         for (int i = 0; i < this.players.length; i++) {
             print(HUMAN_OR_COMPUTER.formatted(firstPlayerMarker.getValue()));
-            PlayerType firstPlayerType = new PlayerTypeScanner(scanner).getPlayerType();
+            PlayerType firstPlayerType = playerTypeScanner.getPlayerType();
             this.players[i] = switch (firstPlayerType) {
                 case HUMAN -> new HumanPlayer(scanner, firstPlayerMarker, this.board);
-                case COMPUTER -> new ComputerPlayer(firstPlayerMarker);
+                case COMPUTER -> new ComputerPlayer(firstPlayerMarker, this.board);
             };
             firstPlayerMarker = firstPlayerMarker.next();
         }
@@ -59,6 +60,7 @@ public class TicTacToe {
         while (status == GameStatus.IN_PROGRESS) {
             Player player = getCurrentPlayer(round++);
             Cell cell = player.getNextMove();
+            print(PLAYER_SELECTED.formatted(player.getMarker().getValue(), cell));
             this.board.setCellValue(cell, player.getMarker().getValue());
             print(this.board.toTableString());
             round++;

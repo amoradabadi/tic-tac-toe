@@ -38,7 +38,7 @@ public class Board {
                         .anyMatch(j -> this.isEmpty(i, j)));
     }
 
-    private boolean isEmpty(int i, int j) {
+    public boolean isEmpty(int i, int j) {
         return this.board[i][j] == EMPTY;
     }
 

@@ -6,6 +6,11 @@ public class Cell {
     private final int x;
     private final int y;
 
+    public Cell(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
     public Cell(String x, String y) {
         this.x = Integer.parseInt(x);
         this.y = Integer.parseInt(y);
@@ -30,5 +35,10 @@ public class Cell {
         if (o == null || getClass() != o.getClass()) return false;
         Cell cell = (Cell) o;
         return x == cell.x && y == cell.y;
+    }
+
+    @Override
+    public String toString() {
+        return x + "," + y;
     }
 }
