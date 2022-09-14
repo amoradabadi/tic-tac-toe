@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public enum Marker {
-    X('X'), O('O');
+    X('x'), O('o');
 
     private final char value;
 
@@ -14,7 +14,7 @@ public enum Marker {
 
     public static Optional<Marker> getValue(String value) {
         return Arrays.stream(Marker.values())
-                .filter(marker -> marker.name().equalsIgnoreCase(value))
+                .filter(marker -> value.equalsIgnoreCase(String.valueOf(marker.value)))
                 .findFirst();
     }
 

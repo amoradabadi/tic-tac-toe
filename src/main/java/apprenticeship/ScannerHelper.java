@@ -5,6 +5,8 @@ import apprenticeship.error.QuitException;
 
 import java.util.Scanner;
 
+import static apprenticeship.Constants.EXIT;
+
 public class ScannerHelper {
     private final Scanner scanner;
 
@@ -14,7 +16,7 @@ public class ScannerHelper {
 
     public String blockScannerAndGetUserInput() throws QuitException {
         String next = scanner.next();
-        if (next.trim().equalsIgnoreCase("q")) {
+        if (next.trim().equalsIgnoreCase(EXIT)) {
             throw new QuitException();
         }
         return next.trim();
