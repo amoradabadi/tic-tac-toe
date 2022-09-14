@@ -2,11 +2,9 @@ package apprenticeship;
 
 import apprenticeship.enums.GameStatus;
 import apprenticeship.error.QuitException;
-import apprenticeship.model.Cell;
-import apprenticeship.model.Marker;
-import apprenticeship.model.Player;
-import apprenticeship.scan.CellScanner;
+import apprenticeship.model.*;
 import apprenticeship.scan.MarkerScanner;
+import apprenticeship.scan.PlayerTypeScanner;
 
 import java.util.Scanner;
 
@@ -15,7 +13,7 @@ import static apprenticeship.Constants.*;
 public class TicTacToe {
     private final Board board = new Board();
     private final Player[] players = new Player[2];
-    private GameStatus status;
+    private GameStatus status = GameStatus.IN_PROGRESS;
 
     public static void main(String[] args) {
         TicTacToe ticTacToe = new TicTacToe();
@@ -24,14 +22,13 @@ public class TicTacToe {
     }
 
     public void start(Scanner scanner) {
-        print(showInstructions());
+        print(INSTRUCTIONS_TEXT.formatted(Marker.X.getValue(), Marker.O.getValue()));
         try {
-            Marker firstPlayerMarker = getPlayerMarker(scanner);
-            initializePlayers(firstPlayerMarker);
+            initializePlayers(scanner);
             print(this.board.toTableString());
-            getUserInputAndMove(scanner);
+            getUserInputAndMove();
         } catch (QuitException e) {
-            print("Bye");
+            print(BYE);
         }
     }
 
@@ -39,45 +36,40 @@ public class TicTacToe {
         System.out.println(text);
     }
 
-    private String showInstructions() {
-        return INSTRUCTIONS_TEXT.formatted(CELL_SEPARATOR_REGEX, CELL_SEPARATOR_REGEX, Marker.X, Marker.O);
+    private void initializePlayers(Scanner scanner) throws QuitException {
+        Marker firstPlayerMarker = new MarkerScanner(scanner).getMarker();
+
+        for (int i = 0; i < this.players.length; i++) {
+            print(HUMAN_OR_COMPUTER.formatted(firstPlayerMarker.getValue()));
+            PlayerType firstPlayerType = new PlayerTypeScanner(scanner).getPlayerType();
+            this.players[i] = switch (firstPlayerType) {
+                case HUMAN -> new HumanPlayer(scanner, firstPlayerMarker, this.board);
+                case COMPUTER -> new ComputerPlayer(firstPlayerMarker);
+            };
+            firstPlayerMarker = firstPlayerMarker.next();
+        }
     }
 
-    private Marker getPlayerMarker(Scanner scanner) throws QuitException {
-        return new MarkerScanner(scanner).getMarker();
-    }
-
-    private void initializePlayers(Marker firstPlayerMarker) {
-        this.players[0] = new Player(firstPlayerMarker);
-        this.players[1] = new Player(firstPlayerMarker.next());
-        this.status = GameStatus.IN_PROGRESS;
-    }
-
-    private void getUserInputAndMove(Scanner scanner) throws QuitException {
+    private void getUserInputAndMove() throws QuitException {
         int round = 0;
         while (status == GameStatus.IN_PROGRESS) {
-            Player player = getCurrentPlayer(round);
-            Cell cell = getPlayerMove(scanner);
-            this.board.setCellValue(cell, player.marker().getValue());
+            Player player = getCurrentPlayer(round++);
+            Cell cell = player.getNextMove();
+            this.board.setCellValue(cell, player.getMarker().getValue());
             print(this.board.toTableString());
-            round++;
             status = checkStatus();
             if (status == GameStatus.FINISHED_DRAW) {
                 print(NO_WINNER_TEXT);
             } else if (status == GameStatus.FINISHED_WINNER) {
-                print(PLAYER_HAS_WON.formatted(player.marker()));
+                print(PLAYER_HAS_WON.formatted(player.getMarker()));
             }
         }
     }
 
     private Player getCurrentPlayer(int round) {
         Player player = players[round % 2];
-        print(PLAYER_TEXT.formatted(player.marker()));
+        print(PLAYER_TEXT.formatted(player.getMarker()));
         return player;
-    }
-
-    private Cell getPlayerMove(Scanner scanner) throws QuitException {
-        return new CellScanner(scanner).getCell(this.board);
     }
 
     private GameStatus checkStatus() {
