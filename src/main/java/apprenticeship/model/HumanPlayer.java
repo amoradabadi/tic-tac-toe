@@ -10,7 +10,7 @@ import java.util.Scanner;
 public class HumanPlayer extends Player {
     private final CellScanner cellScanner;
 
-    public HumanPlayer(Scanner scanner, Marker marker, Board board) {
+    public HumanPlayer(Scanner scanner, String marker, Board board) {
         super(marker);
         this.cellScanner = new CellScanner(scanner, board);
     }

@@ -1,9 +1,10 @@
 package apprenticeship;
 
 import apprenticeship.enums.GameStatus;
+import apprenticeship.enums.PlayerType;
 import apprenticeship.error.QuitException;
 import apprenticeship.model.*;
-import apprenticeship.scan.MarkerScanner;
+import apprenticeship.scan.CustomMarkerScanner;
 import apprenticeship.scan.PlayerTypeScanner;
 
 import java.util.Scanner;
@@ -22,7 +23,7 @@ public class TicTacToe {
     }
 
     public void start(Scanner scanner) {
-        print(INSTRUCTIONS_TEXT.formatted(Marker.X.getValue(), Marker.O.getValue()));
+        print(INSTRUCTIONS_TEXT);
         try {
             initializePlayers(scanner);
             print(this.board.toTableString());
@@ -37,17 +38,14 @@ public class TicTacToe {
     }
 
     private void initializePlayers(Scanner scanner) throws QuitException {
-        Marker firstPlayerMarker = new MarkerScanner(scanner).getMarker();
+        CustomMarkerScanner markerScanner = new CustomMarkerScanner(scanner);
         PlayerTypeScanner playerTypeScanner = new PlayerTypeScanner(scanner);
 
         for (int i = 0; i < this.players.length; i++) {
-            print(HUMAN_OR_COMPUTER.formatted(firstPlayerMarker.getValue()));
-            PlayerType firstPlayerType = playerTypeScanner.getPlayerType();
-            this.players[i] = switch (firstPlayerType) {
-                case HUMAN -> new HumanPlayer(scanner, firstPlayerMarker, this.board);
-                case COMPUTER -> new ComputerPlayer(firstPlayerMarker, this.board);
-            };
-            firstPlayerMarker = firstPlayerMarker.next();
+            String marker = markerScanner.getMarker(CHOOSE_A_MARKER_FOR_PLAYER.formatted(i + 1));
+            PlayerType playerType = playerTypeScanner.getPlayerType(HUMAN_OR_COMPUTER.formatted(marker));
+            this.players[i] = createPlayer(scanner, marker, playerType);
+            this.board.setMarkerLength(marker.length());
         }
     }
 
@@ -56,8 +54,8 @@ public class TicTacToe {
         while (status == GameStatus.IN_PROGRESS) {
             Player player = getCurrentPlayer(round++);
             Cell cell = player.getNextMove();
-            print(PLAYER_SELECTED.formatted(player.getMarker().getValue(), cell));
-            this.board.setCellValue(cell, player.getMarker().getValue());
+            print(PLAYER_SELECTED.formatted(player.getMarker(), cell));
+            this.board.setCellValue(cell, player.getMarker());
             print(this.board.toTableString());
             status = checkStatus();
             if (status == GameStatus.FINISHED_DRAW) {
@@ -66,6 +64,13 @@ public class TicTacToe {
                 print(PLAYER_HAS_WON.formatted(player.getMarker()));
             }
         }
+    }
+
+    private Player createPlayer(Scanner scanner, String marker, PlayerType playerType) {
+        return switch (playerType) {
+            case HUMAN -> new HumanPlayer(scanner, marker, this.board);
+            case COMPUTER -> new ComputerPlayer(marker, this.board);
+        };
     }
 
     private Player getCurrentPlayer(int round) {

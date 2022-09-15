@@ -1,4 +1,4 @@
-package apprenticeship;
+package apprenticeship.scan;
 
 
 import apprenticeship.error.QuitException;
@@ -15,7 +15,7 @@ public class ScannerHelper {
     }
 
     public String blockScannerAndGetUserInput() throws QuitException {
-        String next = scanner.next();
+        String next = scanner.nextLine();
         if (next.trim().equalsIgnoreCase(EXIT)) {
             throw new QuitException();
         }

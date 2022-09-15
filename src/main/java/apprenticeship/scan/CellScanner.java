@@ -1,7 +1,6 @@
 package apprenticeship.scan;
 
 import apprenticeship.Board;
-import apprenticeship.ScannerHelper;
 import apprenticeship.error.QuitException;
 import apprenticeship.model.Cell;
 

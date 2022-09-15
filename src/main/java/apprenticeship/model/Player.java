@@ -4,13 +4,13 @@ package apprenticeship.model;
 import apprenticeship.error.QuitException;
 
 public abstract class Player {
-    private final Marker marker;
+    private final String marker;
 
-    public Player(Marker marker) {
+    public Player(String marker) {
         this.marker = marker;
     }
 
-    public Marker getMarker() {
+    public String getMarker() {
         return marker;
     }
 

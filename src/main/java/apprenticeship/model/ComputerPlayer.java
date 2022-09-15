@@ -8,7 +8,7 @@ import static apprenticeship.Constants.BOARD_MAX;
 public class ComputerPlayer extends Player {
     private final Board board;
 
-    public ComputerPlayer(Marker marker, Board board) {
+    public ComputerPlayer(String marker, Board board) {
         super(marker);
         this.board = board;
     }
