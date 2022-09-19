@@ -2,9 +2,8 @@ package apprenticeship;
 
 import apprenticeship.model.Cell;
 
-import java.util.stream.IntStream;
-
 import static apprenticeship.Constants.*;
+import static java.util.stream.IntStream.range;
 
 public class Board {
     private final char[][] board = new char[][]{
@@ -34,8 +33,8 @@ public class Board {
     }
 
     public boolean hasEmptySpace() {
-        return IntStream.range(0, BOARD_MAX)
-                .anyMatch(i -> IntStream.range(0, BOARD_MAX)
+        return range(0, BOARD_MAX)
+                .anyMatch(i -> range(0, BOARD_MAX)
                         .anyMatch(j -> this.isEmpty(i, j)));
     }
 
@@ -46,11 +45,8 @@ public class Board {
     public boolean hasEqualBackDiagonal() {
         int col = BOARD_MAX - 1;
         char first = this.getCellValue(0, col);
-        if (first == EMPTY) {
-            return false;
-        }
         for (int i = 0; i < BOARD_MAX; i++, col--) {
-            if (this.getCellValue(i, col) != first) {
+            if (first == EMPTY || this.getCellValue(i, col) != first) {
                 return false;
             }
         }
@@ -66,7 +62,7 @@ public class Board {
         if (first == EMPTY) {
             return false;
         }
-        return IntStream.range(0, BOARD_MAX).noneMatch(i -> this.getCellValue(i, i) != first);
+        return range(0, BOARD_MAX).allMatch(i -> this.getCellValue(i, i) == first);
     }
 
     public boolean hasEqualItemsInRow() {
@@ -80,7 +76,7 @@ public class Board {
     }
 
     private boolean hasSameCharsInRow(char first, int row) {
-        return IntStream.range(0, BOARD_MAX).noneMatch(col -> this.getCellValue(row, col) != first);
+        return range(0, BOARD_MAX).noneMatch(col -> this.getCellValue(row, col) != first);
     }
 
     public boolean hasEqualItemsInColumn() {
@@ -94,6 +90,6 @@ public class Board {
     }
 
     private boolean hasSameCharsInCol(char first, int col) {
-        return IntStream.range(0, BOARD_MAX).noneMatch(row -> this.getCellValue(row, col) != first);
+        return range(0, BOARD_MAX).noneMatch(row -> this.getCellValue(row, col) != first);
     }
 }

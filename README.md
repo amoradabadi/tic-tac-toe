@@ -2,6 +2,10 @@
 
 Yet another Tic-Tac-Toe application in Java. Java 17 and Maven are required to build, run and test.
 
+## Requirements
+- Java 17
+- Maven
+
 ## How to build
 
 You can build the application and create the jar file with following command:

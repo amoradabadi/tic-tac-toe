@@ -15,7 +15,6 @@ import static apprenticeship.Constants.*;
 public class TicTacToe {
     private final Board board = new Board();
     private final Player[] players = new Player[2];
-    private GameStatus status;
 
     public static void main(String[] args) {
         TicTacToe ticTacToe = new TicTacToe();
@@ -50,11 +49,11 @@ public class TicTacToe {
     private void initializePlayers(Marker firstPlayerMarker) {
         this.players[0] = new Player(firstPlayerMarker);
         this.players[1] = new Player(firstPlayerMarker.next());
-        this.status = GameStatus.IN_PROGRESS;
     }
 
     private void getUserInputAndMove(Scanner scanner) throws QuitException {
         int round = 0;
+        GameStatus status = GameStatus.IN_PROGRESS;
         while (status == GameStatus.IN_PROGRESS) {
             Player player = getCurrentPlayer(round);
             Cell cell = getPlayerMove(scanner);
@@ -62,11 +61,7 @@ public class TicTacToe {
             print(this.board.toTableString());
             round++;
             status = checkStatus();
-            if (status == GameStatus.FINISHED_DRAW) {
-                print(NO_WINNER_TEXT);
-            } else if (status == GameStatus.FINISHED_WINNER) {
-                print(PLAYER_HAS_WON.formatted(player.marker()));
-            }
+            printWinnerOrDraw(status, player);
         }
     }
 
@@ -81,13 +76,21 @@ public class TicTacToe {
     }
 
     private GameStatus checkStatus() {
-        if (this.board.hasEqualItemsInRow() || this.board.hasEqualItemsInColumn() || this.board.hasEqualDiagonal() || this.board.hasEqualBackDiagonal()) {
-            return GameStatus.FINISHED_WINNER;
-        } else if (this.board.hasEmptySpace()) {
-            return GameStatus.IN_PROGRESS;
-        } else {
-            return GameStatus.FINISHED_DRAW;
+        if (boardHasWinner()) return GameStatus.FINISHED_WINNER;
+        else if (this.board.hasEmptySpace()) return GameStatus.IN_PROGRESS;
+        else return GameStatus.FINISHED_DRAW;
+    }
+
+    private void printWinnerOrDraw(GameStatus status, Player player) {
+        if (status == GameStatus.FINISHED_DRAW) {
+            print(NO_WINNER_TEXT);
+        } else if (status == GameStatus.FINISHED_WINNER) {
+            print(PLAYER_HAS_WON.formatted(player.marker()));
         }
+    }
+
+    private boolean boardHasWinner() {
+        return this.board.hasEqualItemsInRow() || this.board.hasEqualItemsInColumn() || this.board.hasEqualDiagonal() || this.board.hasEqualBackDiagonal();
     }
 
 }
