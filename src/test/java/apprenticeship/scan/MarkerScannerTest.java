@@ -2,6 +2,7 @@ package apprenticeship.scan;
 
 import apprenticeship.error.QuitException;
 import apprenticeship.model.Marker;
+import apprenticeship.model.PlayerType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,21 +14,22 @@ import java.io.PrintStream;
 import java.util.Scanner;
 
 import static apprenticeship.Constants.INVALID_MARKER_VALUE;
+import static apprenticeship.Constants.INVALID_PLAYER_TYPE_VALUE;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class MarkerScannerTest {
+class PlayerMarkerScannerTest {
 
     private Scanner scanner;
-    private MarkerScanner markerScanner;
+    private PlayerMarkerScanner playerMarkerScanner;
     private ByteArrayOutputStream systemOut;
 
     @BeforeEach
     void setUp() {
         systemOut = new ByteArrayOutputStream();
         scanner = mock(Scanner.class);
-        markerScanner = new MarkerScanner(scanner);
+        playerMarkerScanner = new PlayerMarkerScanner(scanner);
         System.setOut(new PrintStream(systemOut));
     }
 
@@ -41,7 +43,7 @@ class MarkerScannerTest {
     void whenWithDifferentCase_shouldSelectX(String userInput) throws QuitException {
         when(scanner.next()).thenReturn(userInput);
 
-        assertEquals(Marker.X, markerScanner.getMarker());
+        assertEquals(Marker.X, playerMarkerScanner.getMarker());
     }
 
     @ParameterizedTest
@@ -49,7 +51,7 @@ class MarkerScannerTest {
     void whenWithDifferentCase_shouldSelectO(String userInput) throws QuitException {
         when(scanner.next()).thenReturn(userInput);
 
-        assertEquals(Marker.O, markerScanner.getMarker());
+        assertEquals(Marker.O, playerMarkerScanner.getMarker());
     }
 
     @ParameterizedTest
@@ -57,7 +59,7 @@ class MarkerScannerTest {
     void whenInvalidMarker_shouldReturnError(String userInput) throws QuitException {
         when(scanner.next()).thenReturn(userInput, "X");
 
-        markerScanner.getMarker();
+        playerMarkerScanner.getMarker();
 
         assertTrue(systemOut.toString().contains(INVALID_MARKER_VALUE.formatted(Marker.X, Marker.O)));
     }
@@ -66,7 +68,41 @@ class MarkerScannerTest {
     void whenQ_shouldThrowException() {
         when(scanner.next()).thenReturn("q");
 
-        assertThrows(QuitException.class, () -> markerScanner.getMarker());
+        assertThrows(QuitException.class, () -> playerMarkerScanner.getMarker());
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(strings = {"h", "H", " H", "H ", " H "})
+    void whenWithDifferentCase_playerTypeShouldSelectH(String userInput) throws QuitException {
+        when(scanner.next()).thenReturn(userInput);
+
+        assertEquals(PlayerType.HUMAN, playerMarkerScanner.getPlayerType());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"c", "C", " C", "C ", " C "})
+    void whenWithDifferentCase_playerTypeShouldSelectC(String userInput) throws QuitException {
+        when(scanner.next()).thenReturn(userInput);
+
+        assertEquals(PlayerType.COMPUTER, playerMarkerScanner.getPlayerType());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"anything", "XX", "XO"})
+    void whenInvalidPlayerType_shouldReturnError(String userInput) throws QuitException {
+        when(scanner.next()).thenReturn(userInput, "h");
+
+        playerMarkerScanner.getPlayerType();
+
+        assertTrue(systemOut.toString().contains(INVALID_PLAYER_TYPE_VALUE));
+    }
+
+    @Test
+    void whenQinPlayerType_shouldThrowException() {
+        when(scanner.next()).thenReturn("q");
+
+        assertThrows(QuitException.class, () -> playerMarkerScanner.getPlayerType());
     }
 
 }

@@ -116,7 +116,7 @@ class BoardTest {
         board.setCellValue(new Cell(row, "2"), 'X');
         board.setCellValue(new Cell(row, "3"), 'X');
 
-        assertTrue(board.hasEqualItemsInRow());
+        assertTrue(board.hasEqualItemsInRowOrCol());
     }
 
     @ParameterizedTest
@@ -125,7 +125,7 @@ class BoardTest {
         board.setCellValue(new Cell(row, "1"), 'X');
         board.setCellValue(new Cell(row, "2"), 'X');
 
-        assertFalse(board.hasEqualItemsInRow());
+        assertFalse(board.hasEqualItemsInRowOrCol());
     }
 
     @ParameterizedTest
@@ -135,7 +135,7 @@ class BoardTest {
         board.setCellValue(new Cell("2", col), 'X');
         board.setCellValue(new Cell("3", col), 'X');
 
-        assertTrue(board.hasEqualItemsInColumn());
+        assertTrue(board.hasEqualItemsInRowOrCol());
     }
 
     @ParameterizedTest
@@ -144,7 +144,7 @@ class BoardTest {
         board.setCellValue(new Cell("1", col), 'X');
         board.setCellValue(new Cell("2", col), 'X');
 
-        assertFalse(board.hasEqualItemsInColumn());
+        assertFalse(board.hasEqualItemsInRowOrCol());
     }
 
 }

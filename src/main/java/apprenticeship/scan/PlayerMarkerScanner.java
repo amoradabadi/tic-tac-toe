@@ -3,14 +3,15 @@ package apprenticeship.scan;
 import apprenticeship.ScannerHelper;
 import apprenticeship.error.QuitException;
 import apprenticeship.model.Marker;
+import apprenticeship.model.PlayerType;
 
 import java.util.Optional;
 import java.util.Scanner;
 
-import static apprenticeship.Constants.INVALID_MARKER_VALUE;
+import static apprenticeship.Constants.*;
 
-public class MarkerScanner extends ScannerHelper {
-    public MarkerScanner(Scanner scanner) {
+public class PlayerMarkerScanner extends ScannerHelper {
+    public PlayerMarkerScanner(Scanner scanner) {
         super(scanner);
     }
 
@@ -24,6 +25,18 @@ public class MarkerScanner extends ScannerHelper {
             }
         } while (optionalMarker.isEmpty());
         return optionalMarker.get();
+    }
+
+    public PlayerType getPlayerType() throws QuitException {
+        Optional<PlayerType> optional;
+        do {
+            String userInput = blockScannerAndGetUserInput();
+            optional = PlayerType.getValue(userInput);
+            if (optional.isEmpty()) {
+                System.out.println(INVALID_PLAYER_TYPE_VALUE + NEW_LINE);
+            }
+        } while (optional.isEmpty());
+        return optional.get();
     }
 
 }
