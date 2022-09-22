@@ -65,31 +65,23 @@ public class Board {
         return range(0, BOARD_MAX).allMatch(i -> this.getCellValue(i, i) == first);
     }
 
-    public boolean hasEqualItemsInRow() {
-        for (int row = 0; row < BOARD_MAX; row++) {
-            char first = this.getCellValue(row, 0);
-            if (first != EMPTY && hasSameCharsInRow(first, row)) {
+    public boolean hasEqualItemsInRowOrCol() {
+        for (int i = 0; i < BOARD_MAX; i++) {
+            char firstRow = this.getCellValue(i, 0);
+            char firstCol = this.getCellValue(0, i);
+
+            if (firstRow != EMPTY && hasSameCharsIn(firstRow, i, true)) {
+                return true;
+            }
+            if (firstCol != EMPTY && hasSameCharsIn(firstCol, i, false)) {
                 return true;
             }
         }
         return false;
     }
 
-    private boolean hasSameCharsInRow(char first, int row) {
-        return range(0, BOARD_MAX).noneMatch(col -> this.getCellValue(row, col) != first);
+    private boolean hasSameCharsIn(char first, int index, boolean isRow) {
+        return range(0, BOARD_MAX).allMatch(i -> isRow ? this.getCellValue(index, i) == first : this.getCellValue(i, index) == first);
     }
 
-    public boolean hasEqualItemsInColumn() {
-        for (int col = 0; col < BOARD_MAX; col++) {
-            char first = this.getCellValue(0, col);
-            if (first != EMPTY && hasSameCharsInCol(first, col)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean hasSameCharsInCol(char first, int col) {
-        return range(0, BOARD_MAX).noneMatch(row -> this.getCellValue(row, col) != first);
-    }
 }

@@ -12,23 +12,20 @@ import static apprenticeship.Constants.*;
 
 public class CellScanner extends ScannerHelper {
 
-    private final Board board;
-
-    public CellScanner(Scanner scanner, Board board) {
+    public CellScanner(Scanner scanner) {
         super(scanner);
-        this.board = board;
     }
 
-    public Cell getCell() throws QuitException {
+    public Cell getCell(Board board) throws QuitException {
         Optional<Cell> optionalCell;
         do {
             String userInput = blockScannerAndGetUserInput();
-            optionalCell = parseValue(userInput);
+            optionalCell = parseValue(userInput, board);
         } while (optionalCell.isEmpty());
         return optionalCell.get();
     }
 
-    private Optional<Cell> parseValue(String userInput) {
+    private Optional<Cell> parseValue(String userInput, Board board) {
         String[] dataArr = userInput.split(CELL_SEPARATOR_REGEX);
         if (dataArr.length != 2) {
             System.out.println(INVALID_CELL_VALUE);
