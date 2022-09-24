@@ -2,9 +2,8 @@ package apprenticeship;
 
 import apprenticeship.model.Cell;
 
-import java.util.stream.IntStream;
-
 import static apprenticeship.Constants.*;
+import static java.util.stream.IntStream.range;
 
 public class Board {
     private final String[][] board = new String[][]{
@@ -20,10 +19,8 @@ public class Board {
 
     public String toTableString() {
         final String middle = "-+-";
-        final String left = "+-";
-        final String right = "-+";
         final String dash = "-";
-        final String separatorRow = left + dash.repeat(markerLength) + middle + dash.repeat(markerLength) + middle + dash.repeat(markerLength) + right;
+        final String separatorRow = "+-" + dash.repeat(markerLength) + middle + dash.repeat(markerLength) + middle + dash.repeat(markerLength) + "-+";
         StringBuilder sb = new StringBuilder();
         for (String[] rows : this.board) {
             sb.append(separatorRow).append(NEW_LINE);
@@ -38,15 +35,12 @@ public class Board {
         int maxWidth = markerLength + 2;
         int textLen = text.length();
         int len = textLen + (maxWidth - textLen) / 2;
-        return rightPad(leftPad(text, len), maxWidth);
+        String left = pad(text, len, false);
+        return pad(left, maxWidth, true);
     }
 
-    private static String rightPad(String text, int len) {
-        return String.format("%-" + len + "s", text);
-    }
-
-    private static String leftPad(String text, int len) {
-        return String.format("%" + len + "s", text);
+    private static String pad(String text, int len, boolean isRight) {
+        return String.format("%" + (isRight ? "-" : "") + len + "s", text);
     }
 
     public boolean isFull(Cell cell) {
@@ -54,8 +48,8 @@ public class Board {
     }
 
     public boolean hasEmptySpace() {
-        return IntStream.range(0, BOARD_MAX)
-                .anyMatch(i -> IntStream.range(0, BOARD_MAX)
+        return range(0, BOARD_MAX)
+                .anyMatch(i -> range(0, BOARD_MAX)
                         .anyMatch(j -> this.isEmpty(i, j)));
     }
 
@@ -66,11 +60,8 @@ public class Board {
     public boolean hasEqualBackDiagonal() {
         int col = BOARD_MAX - 1;
         String first = this.getCellValue(0, col);
-        if (first.equals(EMPTY)) {
-            return false;
-        }
         for (int i = 0; i < BOARD_MAX; i++, col--) {
-            if (!this.getCellValue(i, col).equals(first)) {
+            if (first.equals(EMPTY) || !this.getCellValue(i, col).equals(first)) {
                 return false;
             }
         }
@@ -86,35 +77,26 @@ public class Board {
         if (first.equals(EMPTY)) {
             return false;
         }
-        return IntStream.range(0, BOARD_MAX).allMatch(i -> this.getCellValue(i, i).equals(first));
+        return range(0, BOARD_MAX).allMatch(i -> this.getCellValue(i, i).equals(first));
     }
 
-    public boolean hasEqualItemsInRow() {
-        for (int row = 0; row < BOARD_MAX; row++) {
-            String first = this.getCellValue(row, 0);
-            if (!first.equals(EMPTY) && hasSameCharsInRow(first, row)) {
+    public boolean hasEqualItemsInRowOrCol() {
+        for (int i = 0; i < BOARD_MAX; i++) {
+            String firstRow = this.getCellValue(i, 0);
+            String firstCol = this.getCellValue(0, i);
+
+            if (!firstRow.equals(EMPTY) && hasSameCharsIn(firstRow, i, true)) {
+                return true;
+            }
+            if (!firstCol.equals(EMPTY) && hasSameCharsIn(firstCol, i, false)) {
                 return true;
             }
         }
         return false;
     }
 
-    private boolean hasSameCharsInRow(String first, int row) {
-        return IntStream.range(0, BOARD_MAX).allMatch(col -> this.getCellValue(row, col).equals(first));
-    }
-
-    public boolean hasEqualItemsInColumn() {
-        for (int col = 0; col < BOARD_MAX; col++) {
-            String first = this.getCellValue(0, col);
-            if (!first.equals(EMPTY) && hasSameCharsInCol(first, col)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean hasSameCharsInCol(String first, int col) {
-        return IntStream.range(0, BOARD_MAX).allMatch(row -> this.getCellValue(row, col).equals(first));
+    private boolean hasSameCharsIn(String first, int index, boolean isRow) {
+        return range(0, BOARD_MAX).allMatch(i -> isRow ? this.getCellValue(index, i).equals(first) : this.getCellValue(i, index).equals(first));
     }
 
     public void setMarkerLength(int markerLength) {

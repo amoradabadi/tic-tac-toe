@@ -3,9 +3,11 @@ package apprenticeship;
 import apprenticeship.enums.GameStatus;
 import apprenticeship.enums.PlayerType;
 import apprenticeship.error.QuitException;
-import apprenticeship.model.*;
-import apprenticeship.scan.CustomMarkerScanner;
-import apprenticeship.scan.PlayerTypeScanner;
+import apprenticeship.model.Cell;
+import apprenticeship.model.ComputerPlayer;
+import apprenticeship.model.HumanPlayer;
+import apprenticeship.model.Player;
+import apprenticeship.scan.PlayerMarkerScanner;
 
 import java.util.Scanner;
 
@@ -14,7 +16,6 @@ import static apprenticeship.Constants.*;
 public class TicTacToe {
     private final Board board = new Board();
     private final Player[] players = new Player[2];
-    private GameStatus status = GameStatus.IN_PROGRESS;
 
     public static void main(String[] args) {
         TicTacToe ticTacToe = new TicTacToe();
@@ -23,27 +24,22 @@ public class TicTacToe {
     }
 
     public void start(Scanner scanner) {
-        print(INSTRUCTIONS_TEXT);
+        System.out.println(INSTRUCTIONS_TEXT);
         try {
             initializePlayers(scanner);
-            print(this.board.toTableString());
+            System.out.println(this.board.toTableString());
             getUserInputAndMove();
         } catch (QuitException e) {
-            print(BYE);
+            System.out.println(BYE);
         }
     }
 
-    private void print(String text) {
-        System.out.println(text);
-    }
 
     private void initializePlayers(Scanner scanner) throws QuitException {
-        CustomMarkerScanner markerScanner = new CustomMarkerScanner(scanner);
-        PlayerTypeScanner playerTypeScanner = new PlayerTypeScanner(scanner);
-
+        PlayerMarkerScanner playerMarkerScanner = new PlayerMarkerScanner(scanner);
         for (int i = 0; i < this.players.length; i++) {
-            String marker = markerScanner.getMarker(CHOOSE_A_MARKER_FOR_PLAYER.formatted(i + 1));
-            PlayerType playerType = playerTypeScanner.getPlayerType(HUMAN_OR_COMPUTER.formatted(marker));
+            String marker = playerMarkerScanner.getMarker(CHOOSE_A_MARKER_FOR_PLAYER.formatted(i + 1));
+            PlayerType playerType = playerMarkerScanner.getPlayerType(HUMAN_OR_COMPUTER.formatted(marker));
             this.players[i] = createPlayer(scanner, marker, playerType);
             this.board.setMarkerLength(marker.length());
         }
@@ -51,19 +47,20 @@ public class TicTacToe {
 
     private void getUserInputAndMove() throws QuitException {
         int round = 0;
+        GameStatus status = GameStatus.IN_PROGRESS;
         while (status == GameStatus.IN_PROGRESS) {
             Player player = getCurrentPlayer(round++);
-            Cell cell = player.getNextMove();
-            print(PLAYER_SELECTED.formatted(player.getMarker(), cell));
-            this.board.setCellValue(cell, player.getMarker());
-            print(this.board.toTableString());
+            playerNextMove(player);
+            System.out.println(this.board.toTableString());
             status = checkStatus();
-            if (status == GameStatus.FINISHED_DRAW) {
-                print(NO_WINNER_TEXT);
-            } else if (status == GameStatus.FINISHED_WINNER) {
-                print(PLAYER_HAS_WON.formatted(player.getMarker()));
-            }
+            printWinnerOrDraw(status, player);
         }
+    }
+
+    private void playerNextMove(Player player) throws QuitException {
+        Cell cell = player.getNextMove();
+        System.out.printf(PLAYER_SELECTED, player.getMarker(), cell);
+        this.board.setCellValue(cell, player.getMarker());
     }
 
     private Player createPlayer(Scanner scanner, String marker, PlayerType playerType) {
@@ -75,18 +72,26 @@ public class TicTacToe {
 
     private Player getCurrentPlayer(int round) {
         Player player = players[round % 2];
-        print(PLAYER_TEXT.formatted(player.getMarker()));
+        System.out.printf(PLAYER_TEXT, player.getMarker());
         return player;
     }
 
     private GameStatus checkStatus() {
-        if (this.board.hasEqualItemsInRow() || this.board.hasEqualItemsInColumn() || this.board.hasEqualDiagonal() || this.board.hasEqualBackDiagonal()) {
-            return GameStatus.FINISHED_WINNER;
-        } else if (this.board.hasEmptySpace()) {
-            return GameStatus.IN_PROGRESS;
-        } else {
-            return GameStatus.FINISHED_DRAW;
+        if (boardHasWinner()) return GameStatus.FINISHED_WINNER;
+        else if (this.board.hasEmptySpace()) return GameStatus.IN_PROGRESS;
+        else return GameStatus.FINISHED_DRAW;
+    }
+
+    private void printWinnerOrDraw(GameStatus status, Player player) {
+        if (status == GameStatus.FINISHED_DRAW) {
+            System.out.println(NO_WINNER_TEXT);
+        } else if (status == GameStatus.FINISHED_WINNER) {
+            System.out.printf(PLAYER_HAS_WON, player.getMarker());
         }
+    }
+
+    private boolean boardHasWinner() {
+        return this.board.hasEqualItemsInRowOrCol() || this.board.hasEqualDiagonal() || this.board.hasEqualBackDiagonal();
     }
 
 }

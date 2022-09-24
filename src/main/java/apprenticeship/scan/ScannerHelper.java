@@ -15,7 +15,7 @@ public class ScannerHelper {
     }
 
     public String blockScannerAndGetUserInput() throws QuitException {
-        String next = scanner.nextLine();
+        String next = scanner.next();
         if (next.trim().equalsIgnoreCase(EXIT)) {
             throw new QuitException();
         }

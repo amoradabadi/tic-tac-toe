@@ -1,17 +1,19 @@
 package apprenticeship.scan;
 
+import apprenticeship.enums.PlayerType;
 import apprenticeship.error.QuitException;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 
-import static apprenticeship.Constants.INVALID_MARKER_DUPLICATE_VALUE;
+import static apprenticeship.Constants.*;
 
-public class CustomMarkerScanner extends ScannerHelper {
+public class PlayerMarkerScanner extends ScannerHelper {
     private final Set<String> set = new HashSet<>();
 
-    public CustomMarkerScanner(Scanner scanner) {
+    public PlayerMarkerScanner(Scanner scanner) {
         super(scanner);
     }
 
@@ -29,6 +31,19 @@ public class CustomMarkerScanner extends ScannerHelper {
         } while (exists);
         set.add(userInput);
         return userInput;
+    }
+
+    public PlayerType getPlayerType(String text) throws QuitException {
+        System.out.println(text);
+        Optional<PlayerType> optional;
+        do {
+            String userInput = blockScannerAndGetUserInput();
+            optional = PlayerType.getValue(userInput);
+            if (optional.isEmpty()) {
+                System.out.println(INVALID_PLAYER_TYPE_VALUE + NEW_LINE);
+            }
+        } while (optional.isEmpty());
+        return optional.get();
     }
 
 
