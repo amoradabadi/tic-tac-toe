@@ -30,7 +30,7 @@ class CellScannerTest {
         systemOut = new ByteArrayOutputStream();
         scanner = mock(Scanner.class);
         board = mock(Board.class);
-        cellScanner = new CellScanner(scanner);
+        cellScanner = new CellScanner(scanner, board);
         System.setOut(new PrintStream(systemOut));
     }
 
@@ -43,7 +43,7 @@ class CellScannerTest {
     void whenQ_shouldThrowException() {
         when(scanner.next()).thenReturn("q");
 
-        assertThrows(QuitException.class, () -> cellScanner.getCell(board));
+        assertThrows(QuitException.class, () -> cellScanner.getCell());
     }
 
     @Test
@@ -51,7 +51,7 @@ class CellScannerTest {
         when(scanner.next()).thenReturn("1,1");
         when(board.isFull(new Cell("1", "1"))).thenReturn(false);
 
-        assertEquals(new Cell("1", "1"), cellScanner.getCell(board));
+        assertEquals(new Cell("1", "1"), cellScanner.getCell());
     }
 
     @Test
@@ -59,7 +59,7 @@ class CellScannerTest {
         when(scanner.next()).thenReturn("1,2,3", "1,1");
         when(board.isFull(new Cell("1", "1"))).thenReturn(false);
 
-        cellScanner.getCell(board);
+        cellScanner.getCell();
 
         assertTrue(systemOut.toString().contains(INVALID_CELL_VALUE));
     }
@@ -70,7 +70,7 @@ class CellScannerTest {
         when(scanner.next()).thenReturn(userInput, "1,1");
         when(board.isFull(new Cell("1", "1"))).thenReturn(false);
 
-        cellScanner.getCell(board);
+        cellScanner.getCell();
 
         assertTrue(systemOut.toString().contains(INVALID_CELL_VALUE));
     }
@@ -82,7 +82,7 @@ class CellScannerTest {
         when(scanner.next()).thenReturn("1,1", "1,2");
         when(board.isFull(cell)).thenReturn(true);
 
-        cellScanner.getCell(board);
+        cellScanner.getCell();
 
         assertTrue(systemOut.toString().contains(INVALID_CELL_FULL_VALUE));
     }

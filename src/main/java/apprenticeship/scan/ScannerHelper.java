@@ -1,4 +1,4 @@
-package apprenticeship;
+package apprenticeship.scan;
 
 
 import apprenticeship.error.QuitException;

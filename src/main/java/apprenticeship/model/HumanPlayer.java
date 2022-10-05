@@ -9,16 +9,14 @@ import java.util.Scanner;
 
 public class HumanPlayer extends Player {
     private final CellScanner cellScanner;
-    private final Board board;
 
-    public HumanPlayer(Scanner scanner, Marker marker, Board board) {
+    public HumanPlayer(Scanner scanner, String marker, Board board) {
         super(marker);
-        this.board = board;
-        this.cellScanner = new CellScanner(scanner);
+        this.cellScanner = new CellScanner(scanner, board);
     }
 
     @Override
     public Cell getNextMove() throws QuitException {
-        return cellScanner.getCell(board);
+        return cellScanner.getCell();
     }
 }

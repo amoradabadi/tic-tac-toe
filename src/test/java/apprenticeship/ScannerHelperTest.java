@@ -1,6 +1,7 @@
 package apprenticeship;
 
 import apprenticeship.error.QuitException;
+import apprenticeship.scan.ScannerHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

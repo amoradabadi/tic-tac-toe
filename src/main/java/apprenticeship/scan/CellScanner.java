@@ -1,7 +1,6 @@
 package apprenticeship.scan;
 
 import apprenticeship.Board;
-import apprenticeship.ScannerHelper;
 import apprenticeship.error.QuitException;
 import apprenticeship.model.Cell;
 
@@ -12,20 +11,23 @@ import static apprenticeship.Constants.*;
 
 public class CellScanner extends ScannerHelper {
 
-    public CellScanner(Scanner scanner) {
+    private final Board board;
+
+    public CellScanner(Scanner scanner, Board board) {
         super(scanner);
+        this.board = board;
     }
 
-    public Cell getCell(Board board) throws QuitException {
+    public Cell getCell() throws QuitException {
         Optional<Cell> optionalCell;
         do {
             String userInput = blockScannerAndGetUserInput();
-            optionalCell = parseValue(userInput, board);
+            optionalCell = parseValue(userInput);
         } while (optionalCell.isEmpty());
         return optionalCell.get();
     }
 
-    private Optional<Cell> parseValue(String userInput, Board board) {
+    private Optional<Cell> parseValue(String userInput) {
         String[] dataArr = userInput.split(CELL_SEPARATOR_REGEX);
         if (dataArr.length != 2) {
             System.out.println(INVALID_CELL_VALUE);

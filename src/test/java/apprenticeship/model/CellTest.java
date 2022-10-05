@@ -17,6 +17,14 @@ class CellTest {
     }
 
     @Test
+    void whenUsingNumbersshouldReturnXandY() {
+        Cell cell = new Cell(1, 2);
+
+        assertEquals(1, cell.x());
+        assertEquals(2, cell.y());
+    }
+
+    @Test
     void whenObjectsAreEqual_returnTrue() {
         assertEquals(cell1, cell2);
     }
